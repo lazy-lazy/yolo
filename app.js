@@ -9,7 +9,7 @@ var routes = require('./routes/index');
 //var users = require('./routes/users');
 var settings = require('./settings');
 var flash = require('connect-flash');
-
+var multer  = require('multer');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 
@@ -20,7 +20,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(flash());
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -36,6 +36,15 @@ app.use(session({
     host: settings.host,
     port: settings.port
   })
+}));
+
+var multer  = require('multer');
+
+app.use(multer({
+  dest: './public/images',
+  rename: function (fieldname, filename) {
+    return filename;
+  }
 }));
 
 app.use('/', routes);

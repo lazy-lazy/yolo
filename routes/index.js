@@ -6,7 +6,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  Post.get(null, function (err, posts) {
+  Post.getAll(null, function (err, posts) {
     if (err) {
       posts = [];
     }
@@ -141,6 +141,96 @@ router.post('/post', function (req, res) {
     req.flash('success', '发布成功!');
     res.redirect('/');//发表成功跳转到主页
   });
+});
+
+router.get('/upload',isLogin);
+router.get('/upload',function(req,res){
+    res.render('upload',{
+        title: '文件上传',
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+    });
+});
+
+router.post('/upload',isLogin);
+router.post('/upload',function(req,res){
+    req.flash('success','文件上传成功！');
+    res.redirect('/upload');
+});
+
+router.get('/u/:name',function(req,res){
+    //检查用户是否存在
+    User.get(req.params.name,function(err,user){
+        if(!user){
+            req.flash('error','用户不存在！');
+            return res.redirect('/');
+        }
+
+        Post.getAll(user.name,function(err,posts){
+            if(err){
+                req.flash('error',err);
+                return res.redirect('/');
+            }
+            res.render('user',{
+                title: user.name,
+                posts: posts,
+                user: req.session.user,
+                success: req.flash('success').toString(),
+                error: req.flash('error').toString()
+            });
+        });
+    });
+});
+
+router.get('/u/:name/:day/:title',function(req,res){
+    Post.getOne(req.params.name,req.params.day,req.params.title,function(err,post){
+        if(err){
+            req.flash('error',err);
+            return res.redirect('/');
+        }
+        res.render('article',{
+            title: req.params.title,
+            post: post,
+            user: req.session.user,
+            success: req.flash('success').toString(),
+            error: req.flash('error').toString()
+        });
+
+    });
+});
+
+router.get('/edit/:name/:day/:title',isLogin);
+router.get('/edit/:name/:day/:title',function(req,res){
+    var currentUser = req.session.user;
+    Post.edit(currentUser.name,req.params.day,req.params.title,function(err,post){
+        if(err){
+            req.flash('error',err);
+            return res.redirect('back');
+        }
+        res.render('edit', {
+            title: '编辑',
+            post: post,
+            user: req.session.user,
+            success: req.flash('success').toString(),
+            error: req.flash('error').toString()
+        });
+    });
+});
+
+
+router.post('/edit/:name/:day/:title',isLogin);
+router.post('/edit/:name/:day/:title',function(req,res){
+    var currentUser = req.session.user;
+    Post.update(currentUser.name,req.params.day,req.params.title,req.body.post,function(err){
+        var url = encodeURI('/u/' + req.params.name + '/' + req.params.day + '/' + req.params.title);
+        if (err) {
+            req.flash('error', err);
+            return res.redirect(url);//出错！返回文章页
+        }
+        req.flash('success', '修改成功!');
+        res.redirect(url);//成功！返回文章页
+    })
 });
 
 module.exports = router;
