@@ -1,7 +1,7 @@
 /**
  * Created by dq6663 on 2015-08-19.
  */
-var mongodb = require('./db');
+var mongodb = require('./db.js');
 
 function Post(name, title, post) {
     this.name = name;
