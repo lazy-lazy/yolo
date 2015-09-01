@@ -1,6 +1,4 @@
-﻿#忽略windows生成的缩略图文件
-Thunbs.db
-#忽略Visual Studio生成时的产生的文件
+﻿Thunbs.db
 *.obj
 *.exe
 *.pdb
@@ -35,5 +33,3 @@ publish/
 # Publish Web Output
 *.Publish.xml
 *.azurePubxml
-TCWireless.App.Activity.sln
-PublishProfiles
